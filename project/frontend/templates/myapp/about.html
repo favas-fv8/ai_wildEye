@@ -1,0 +1,25 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block title %}About - Ai-WildEye{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 800px; margin: 0 auto;">
+  <div class="card card-raised fade-in">
+    <div class="card-body" style="padding: 2rem;">
+      <h1 class="text-center mb-4">About Ai-WildEye</h1>
+      <p style="font-size: 1.125rem; line-height: 1.8;">
+        Ai-WildEye is an intelligent wild-animal detection system built using
+        a MobileNetV2-based deep learning model. It classifies various species
+        from images and triggers alerts for selected animals.
+      </p>
+      <p style="font-size: 1.125rem; line-height: 1.8;">
+        The project supports training custom datasets and provides a web
+        interface for administrators and staff to manage alerts and view
+        detection history. It is designed to assist in wildlife monitoring
+        and conservation efforts.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

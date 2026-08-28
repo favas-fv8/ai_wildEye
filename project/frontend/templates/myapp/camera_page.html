@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IP Camera Capture</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
+        #video-container img {
+            max-width: 100%;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        #capture-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 10px;
+        }
+        #last-capture img {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>IP Camera</h1>
+
+    <!-- Live feed from /video -->
+    <div id="video-container">
+        <!-- MJPEG stream works great with <img> -->
+        <img id="live-stream" src="{{ video_url }}" alt="Live Stream">
+    </div>
+
+    <form id="capture-form" method="post">
+        {% csrf_token %}
+        <button type="button" id="capture-btn">Capture & Save Frame</button>
+    </form>
+
+    <div id="status"></div>
+    <div id="last-capture"></div>
+
+    <script>
+        const captureBtn = document.getElementById("capture-btn");
+        const statusDiv = document.getElementById("status");
+        const lastCaptureDiv = document.getElementById("last-capture");
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        captureBtn.addEventListener("click", function () {
+            statusDiv.textContent = "Capturing...";
+
+            fetch("{% url 'save_frame' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrftoken,
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        statusDiv.textContent = data.message;
+                        lastCaptureDiv.innerHTML = `
+                            <p>Last saved: ${data.filename}</p>
+                            <img src="${data.file_url}" alt="Captured frame">
+                        `;
+                    } else {
+                        statusDiv.textContent = "Error: " + (data.message || "Unknown error");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    statusDiv.textContent = "Request failed.";
+                });
+        });
+    </script>
+</body>
+</html>

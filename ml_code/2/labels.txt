@@ -1,0 +1,8 @@
+Buffalo
+ELEPHANT
+Rhino
+Tiger
+Zebra
+cat
+cow
+dog

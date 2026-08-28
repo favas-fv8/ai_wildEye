@@ -1,0 +1,48 @@
+{% extends 'myapp/staff_base.html' %}
+{% load static %}
+{% block title %}Video Analysis - Ai-WildEye{% endblock %}
+
+{% block body %}
+<div class="container fade-in" style="max-width: 700px;">
+  <div class="page-header">
+    <h2>New Video Analysis</h2>
+  </div>
+
+  <div class="card card-raised">
+    <div class="card-body">
+      <form method="post" action="{% url 'staff_test_history_video_add' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label" for="document">Select Video File</label>
+          <input class="form-control-file" type="file" name="document" id="document" accept="video/*" required>
+        </div>
+        <input type="hidden" name="staff_id" value="{{ staff_id }}">
+        <div class="form-group mt-5">
+          <button type="submit" class="btn btn-primary">Upload & Analyze</button>
+          <button type="reset" class="btn btn-outline-secondary">Reset</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if msg %}
+  <div class="analysis-result">
+    <div class="alert alert-info alert-dismissible mt-5" role="alert">
+      <div class="alert-content">{{ msg }}</div>
+      <button type="button" class="alert-close" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    {% if frame_path %}
+    <div class="card card-raised mt-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Detected Frame</h5>
+        <img src="{{ frame_path }}" class="media-thumb media-thumb-lg" alt="Best Prediction Frame">
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

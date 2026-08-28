@@ -1,0 +1,86 @@
+{% extends 'myapp/staff_base.html' %}
+{% load static %}
+{% block title %}Test History - Ai-WildEye{% endblock %}
+
+{% block body %}
+<div class="container fade-in">
+  <div class="mb-3">
+    <a id="btn-back" class="btn btn-outline-secondary" href="{% url 'staff_home' %}" onclick="if (window.history.length > 1) { history.back(); return false; }">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+  </div>
+
+  <div class="page-header">
+    <h2>Test History</h2>
+  </div>
+
+  {% if msg %}
+  <div class="alert alert-info alert-dismissible" role="alert">
+    <div class="alert-content">{{ msg }}</div>
+    <button type="button" class="alert-close" aria-label="Close">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  {% endif %}
+
+  <div class="card card-raised">
+    <div class="card-body">
+      {% if test_list %}
+      <div class="filter-bar mb-4">
+        <a href="{% url 'staff_test_history_view' %}" class="btn btn-sm {% if not current_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+        <a href="{% url 'staff_test_history_view' %}?type=image" class="btn btn-sm {% if current_filter == 'image' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Image</a>
+        <a href="{% url 'staff_test_history_view' %}?type=video" class="btn btn-sm {% if current_filter == 'video' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Video</a>
+        <a href="{% url 'staff_test_history_view' %}?type=live" class="btn btn-sm {% if current_filter == 'live' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Live</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Media</th>
+              <th>Result</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in test_list %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>
+                {% if p.d_type == 'video' %}
+                <span class="badge badge-secondary">Video</span>
+                {% else %}
+                <img src="../static/myapp/media/{{ p.pic_path }}" class="media-thumb" alt="Analysis">
+                {% endif %}
+              </td>
+              <td><span class="badge badge-primary">{{ p.status }}</span></td>
+              <td>
+                {% if p.d_type == 'image' %}
+                <span class="badge badge-info">Image</span>
+                {% elif p.d_type == 'video' %}
+                <span class="badge badge-warning">Video</span>
+                {% else %}
+                <span class="badge badge-success">Live</span>
+                {% endif %}
+              </td>
+              <td>{{ p.dt }}</td>
+              <td>{{ p.tm }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h3>No test records found</h3>
+        <p>Upload an image or video to get started</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

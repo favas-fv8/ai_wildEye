@@ -1,0 +1,1 @@
+"D:\web projects\ai_wildEye\ffmpeg-2025-03-31-git-35c091f4b7-essentials_build\ffmpeg-2025-03-31-git-35c091f4b7-essentials_build\bin\ffmpeg.exe" -y -i "D:\web projects\ai_wildEye\project\myapp/static/myapp/media/tiger2_OHfqkgj.mp4" -vf fps=3 "D:\web projects\ai_wildEye\project\data/extracted/frame_%03d.jpg"

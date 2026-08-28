@@ -1,0 +1,53 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Ai-WildEye{% endblock %}</title>
+    <link rel="icon" href="{% static 'myapp/images/logo.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'myapp/css/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'myapp/css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'myapp/css/components.css' %}">
+    {% block extra_css %}{% endblock %}
+  </head>
+
+  <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="app-header">
+      <div class="navbar">
+        <a class="navbar-brand" href="{% url 'index' %}">
+          <img src="{% static 'myapp/images/logo.png' %}" alt="Ai-WildEye Logo">
+          Ai-WildEye
+        </a>
+
+        <button class="navbar-toggler" type="button" aria-label="Toggle navigation" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+
+        <ul class="nav-links">
+          <li><a class="nav-link" href="{% url 'about' %}">About</a></li>
+          <li><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+          <li class="dropdown">
+            <a class="nav-link" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+              Sign In
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+            <div class="dropdown-menu">
+              <a href="{% url 'admin_login' %}">Admin Login</a>
+              <a href="{% url 'staff_login' %}">Staff Login</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </header>
+
+    <main id="main-content" class="main-content" {% block background %}{% endblock %}>
+      {% block body %}{% endblock %}
+    </main>
+
+    <script src="{% static 'myapp/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

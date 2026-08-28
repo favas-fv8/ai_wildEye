@@ -1,0 +1,55 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %}New User Registration{% endblock %}
+{% block body %}
+<center>
+    <h2>New User Registration</h2>
+	<div class="container">
+    <form role="form" name="frm" action="{% url 'user_details_add' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+			<label for="fname">Name</label>
+	        <input class="form-control" type="text"  id="fname" name="fname" placeholder="First name" required="required">
+			<input class="form-control" type="text"  id="lname" name="lname" placeholder="Last name" required="required">
+		</div>
+	    <div class="form-group">
+            <label>Gender :</label>
+			<div class="custom-control custom-radio custom-control-inline">
+  				<input type="radio" class="custom-control-input" id="gender1" name="gender" value="Male">
+  				<label class="custom-control-label" for="gender1">Male</label>
+			</div>
+			<div class="custom-control custom-radio custom-control-inline">
+  				<input type="radio" class="custom-control-input" id="gender2" name="gender" value="Female">
+  				<label class="custom-control-label" for="gender2">Female</label>
+			</div>
+		</div>
+        <div class="form-group">
+			<label for="contact">Age</label>
+	        <input type="text"  class="form-control" id="age" name="age">
+		</div>
+
+	    <div class="form-group">
+			<label for="addr">Address</label>
+	        <input class="form-control" type="text"  id="addr" name="addr" placeholder="Street" >
+            <input type="text"  class="form-control" id="pin" name="pin" placeholder="pin" >
+		</div>
+	    <div class="form-group">
+			<label for="contact">Contact</label>
+	        <input type="text"  class="form-control" id="contact" name="contact" placeholder="Enter contact">
+		</div>
+		<div class="form-group">
+			<label for="email">Email</label>
+	        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email id"></td>
+		</div>
+        <div class="form-group">
+			<label for="pwd">password</label>
+	        <input type="password" class="form-control" id="pwd" name="pwd"></td>
+		</div>
+	    <button type="submit" class="btn btn-info" id="bt" name="bt">Register</button>
+        <button type="reset" class="btn btn-info" id="rt" name="rt">Reset</button>
+	    </table>
+    </form>
+	{{msg}}
+	</div>
+</center>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %}Ai-WildEye - Wildlife Detection System{% endblock %}
+
+{% block body %}
+<div class="fade-in" style="text-align: center; padding: 2rem 0;">
+  <div class="page-header">
+    <h1>Ai-WildEye</h1>
+    <p class="page-subtitle" style="font-size: 1.25rem; max-width: 600px; margin: 0 auto;">
+      Intelligent wildlife detection powered by deep learning. Upload images or videos to identify animals, or connect to an IP camera for real-time monitoring with automatic alerts.
+    </p>
+  </div>
+
+  <div class="row mt-5" style="justify-content: center;">
+    <div class="col col-md-4">
+      <div class="card card-raised" style="text-align: left;">
+        <div class="card-body">
+          <h3 class="card-title">Image Analysis</h3>
+          <p class="card-text">Upload photos of wildlife for instant species identification and classification.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-4">
+      <div class="card card-raised" style="text-align: left;">
+        <div class="card-body">
+          <h3 class="card-title">Video Analysis</h3>
+          <p class="card-text">Process video footage to detect and classify animals throughout the recording.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-4">
+      <div class="card card-raised" style="text-align: left;">
+        <div class="card-body">
+          <h3 class="card-title">Live Monitoring</h3>
+          <p class="card-text">Real-time IP camera integration with automatic wild animal alerts and email notifications.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

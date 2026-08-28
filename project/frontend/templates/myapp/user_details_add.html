@@ -1,0 +1,30 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %}New User Registration{% endblock %}
+{% block body %}
+<center>
+    <h2>New User Registration</h2>
+	<div class="container">
+    <form role="form" name="frm" action="{% url 'user_details_add' %}" method="post">
+        {% csrf_token %}
+        
+	    <div class="form-group">
+			<label for="patient_no">Patient No</label>
+	        <input type="text"  class="form-control" id="patient_no" name="patient_no" placeholder="Enter patient_no">
+		</div>
+		<div class="form-group">
+			<label for="email">Email</label>
+	        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email id"></td>
+		</div>
+        <div class="form-group">
+			<label for="pwd">password</label>
+	        <input type="password" class="form-control" id="pwd" name="pwd"></td>
+		</div>
+	    <button type="submit" class="btn btn-info" id="bt" name="bt">Register</button>
+        <button type="reset" class="btn btn-info" id="rt" name="rt">Reset</button>
+	    </table>
+    </form>
+	{{msg}}
+	</div>
+</center>
+{% endblock %}

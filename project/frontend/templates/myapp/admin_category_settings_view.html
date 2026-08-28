@@ -1,0 +1,68 @@
+{% extends 'myapp/admin_base.html' %}
+{% load static %}
+{% block title %}Email Settings - Ai-WildEye{% endblock %}
+
+{% block body %}
+<div class="container fade-in" style="max-width: 800px;">
+  <div class="page-header d-flex justify-content-between align-items-center">
+    <h2>Email Settings</h2>
+    <a class="btn btn-primary" href="{% url 'admin_category_settings_add' %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Email
+    </a>
+  </div>
+
+  {% if msg %}
+  <div class="alert alert-success alert-dismissible" role="alert">
+    <div class="alert-content">{{ msg }}</div>
+    <button type="button" class="alert-close" aria-label="Close">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  {% endif %}
+
+  <div class="card card-raised">
+    <div class="card-body">
+      {% if category_list %}
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Email Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tm in category_list %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ tm.category_name }}</td>
+              <td>
+                <div class="d-flex gap-2">
+                  <a class="btn btn-sm btn-outline-primary" href="../admin_category_settings_edit?id={{ tm.id }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Edit
+                  </a>
+                  <a class="btn btn-sm btn-outline-danger" href="../admin_category_settings_delete?id={{ tm.id }}" data-confirm="Are you sure you want to delete this email?">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    Delete
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h3>No email addresses configured</h3>
+        <p>Add email addresses to receive wild animal detection alerts</p>
+        <a class="btn btn-primary" href="{% url 'admin_category_settings_add' %}">Add First Email</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'myapp/user_base.html' %}
+{% load static %}
+{% block title %}Hello User{% endblock %}
+{% block background %}background="{% static './myapp/images/p.png' %}"{% endblock %}
+{% block body %}
+<center>
+        <h2><font color="#366092">Welcome {{ uname}}</font></h2>
+         <!-- <img src="{% static './myapp/images/news.jpg' %}" width="600" height="400"> -->
+
+</center>
+{% endblock %}

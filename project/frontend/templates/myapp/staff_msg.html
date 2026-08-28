@@ -1,0 +1,13 @@
+{% extends 'myapp/staff_base.html' %}
+{% load static %}
+{% block title %}Message - Ai-WildEye{% endblock %}
+{% block body %}
+<div class="container fade-in text-center" style="max-width: 600px; padding-top: 3rem;">
+  <div class="card card-raised">
+    <div class="card-body">
+      <h2 class="mb-3">{{ msg1 }}</h2>
+      <p class="text-muted">{{ msg2 }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

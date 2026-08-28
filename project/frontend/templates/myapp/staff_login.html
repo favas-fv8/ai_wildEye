@@ -1,0 +1,37 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+{% block title %}Staff Login - Ai-WildEye{% endblock %}
+
+{% block body %}
+<div class="auth-wrapper">
+  <div class="auth-card fade-in">
+    <img src="{% static 'myapp/images/staff.png' %}" alt="Staff" class="auth-icon">
+    <h2>Staff Login</h2>
+
+    {% if msg %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <div class="alert-content">{{ msg }}</div>
+      <button type="button" class="alert-close" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'staff_login' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="uname">Username</label>
+        <input class="form-control" type="text" name="uname" id="uname" placeholder="Enter your username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="passwd">Password</label>
+        <input class="form-control" type="password" name="passwd" id="passwd" placeholder="Enter your password" required>
+      </div>
+      <div class="form-group mt-5">
+        <button type="submit" class="btn btn-primary">Sign In</button>
+        <button type="reset" class="btn btn-outline-secondary">Reset</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

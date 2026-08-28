@@ -1,0 +1,5 @@
+20/11/2025 
+Image and video analysis admin part
+template modifications 
+email add, view ,edit, delete
+cam capture in admin added

@@ -1,0 +1,64 @@
+{% extends 'myapp/admin_base.html' %}
+{% load static %}
+{% block title %}Admin Dashboard - Ai-WildEye{% endblock %}
+
+{% block body %}
+<div class="page-header fade-in">
+  <h1>Welcome, Admin</h1>
+  <p class="page-subtitle">Manage your Ai-WildEye detection system</p>
+</div>
+
+<div class="row fade-in">
+  <div class="col col-md-4">
+    <a href="{% url 'admin_pic_pool_add' %}" class="card card-dashboard card-info" style="text-decoration:none;">
+      <div class="card-body">
+        <h3 class="card-title">Image Analysis</h3>
+        <p class="card-text">Upload and analyze images for animal detection</p>
+      </div>
+    </a>
+  </div>
+  <div class="col col-md-4">
+    <a href="{% url 'admin_pic_pool_video_add' %}" class="card card-dashboard card-success" style="text-decoration:none;">
+      <div class="card-body">
+        <h3 class="card-title">Video Analysis</h3>
+        <p class="card-text">Upload and analyze videos for animal detection</p>
+      </div>
+    </a>
+  </div>
+  <div class="col col-md-4">
+    <a href="{% url 'admin_camera_page' %}" class="card card-dashboard card-warning" style="text-decoration:none;">
+      <div class="card-body">
+        <h3 class="card-title">Camera Capture</h3>
+        <p class="card-text">Capture and analyze frames from IP camera</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="row mt-4 fade-in">
+  <div class="col col-md-4">
+    <a href="{% url 'admin_pic_pool_view' %}" class="card card-dashboard" style="text-decoration:none;">
+      <div class="card-body">
+        <h3 class="card-title">Test History</h3>
+        <p class="card-text">View all previous analysis results</p>
+      </div>
+    </a>
+  </div>
+  <div class="col col-md-4">
+    <a href="{% url 'admin_staff_user_view' %}" class="card card-dashboard" style="text-decoration:none;">
+      <div class="card-body">
+        <h3 class="card-title">Staff Management</h3>
+        <p class="card-text">Add, view, and manage staff accounts</p>
+      </div>
+    </a>
+  </div>
+  <div class="col col-md-4">
+    <a href="{% url 'admin_category_settings_view' %}" class="card card-dashboard" style="text-decoration:none;">
+      <div class="card-body">
+        <h3 class="card-title">Email Settings</h3>
+        <p class="card-text">Manage alert email recipients</p>
+      </div>
+    </a>
+  </div>
+</div>
+{% endblock %}

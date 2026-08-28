@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.log
+
+# Virtual environments
+venv/
+.venv/
+
+# Django runtime files
+db.sqlite3
+project/db.sqlite3
+project/data/extracted/
+project/myapp/static/myapp/media/
+
+# ffmpeg builds & archives (large runtime dependency)
+ffmpeg-*/
+res/ffmpeg-*.7z
+
+# ML training data & large archives (use Git LFS if needed)
+ml_code/Animal/
+ml_code/archive*
+
+# OS / editor junk
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

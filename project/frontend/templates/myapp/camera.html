@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IP Camera Capture</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
+        #video-container {
+            margin-bottom: 16px;
+        }
+        #video-container img {
+            max-width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #capture-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        #last-capture img {
+            max-width: 100%;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>IP Camera Stream</h1>
+
+    <div id="video-container">
+        <!-- For MJPEG HTTP streams, <img> works perfectly -->
+        <img id="ip-stream" src="{{ camera_url }}" alt="IP Camera Stream">
+    </div>
+
+    <form id="capture-form" method="post">
+        {% csrf_token %}
+        <button type="button" class="btn btn-default" onclick="window.open('http://192.168.0.198:4747/cam/1/frame.jpg', '_blank').focus();">
+            <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>&nbsp;Save Photo Here
+        </button>
+    </form>
+
+    <div id="status"></div>
+    
+</body>
+
+</html>
