@@ -7,8 +7,11 @@ This service handles all camera-related operations including:
 """
 
 import os
+import glob
 import time
+import shutil
 import logging
+import subprocess
 from typing import Optional, Dict, Any
 
 import requests
@@ -23,72 +26,231 @@ class CameraService:
     DEFAULT_VIDEO_URL = "http://192.168.2.173:4747/video"
     DEFAULT_FRAME_URL = "http://192.168.2.173:4747/cam/1/frame.jpg"
     
+    # Default IP address and stream configuration
+    DEFAULT_IP = "192.168.2.173"
+    IP_PORT = 4747
+    VIDEO_PATH = "/video"
+    FRAME_PATH = "/cam/1/frame.jpg"
+    
     # Request timeout in seconds
     REQUEST_TIMEOUT = 3
-    
+
     @classmethod
-    def get_video_url(cls) -> str:
+    def _resolve_ip(cls, ip: Optional[str]) -> Optional[str]:
+        """Return the effective IP address to use.
+
+        Args:
+            ip: The IP address provided by the user, or None.
+
+        Returns:
+            The provided (trimmed) IP if given, otherwise None.
+        """
+        if ip and str(ip).strip():
+            return str(ip).strip()
+        return None
+
+    @classmethod
+    def build_video_url(cls, ip: Optional[str] = None) -> str:
+        """Build a video stream URL from an IP address.
+
+        Args:
+            ip: The IP camera address. If None, falls back to settings/default.
+
+        Returns:
+            The video stream URL string.
+        """
+        from django.conf import settings
+        effective_ip = cls._resolve_ip(ip)
+        if effective_ip is None:
+            return getattr(settings, 'CAMERA_VIDEO_URL', cls.DEFAULT_VIDEO_URL)
+        return f"http://{effective_ip}:{cls.IP_PORT}{cls.VIDEO_PATH}"
+
+    @classmethod
+    def build_frame_url(cls, ip: Optional[str] = None) -> str:
+        """Build a frame capture URL from an IP address.
+
+        Args:
+            ip: The IP camera address. If None, falls back to settings/default.
+
+        Returns:
+            The frame capture URL string.
+        """
+        from django.conf import settings
+        effective_ip = cls._resolve_ip(ip)
+        if effective_ip is None:
+            return getattr(settings, 'CAMERA_FRAME_URL', cls.DEFAULT_FRAME_URL)
+        return f"http://{effective_ip}:{cls.IP_PORT}{cls.FRAME_PATH}"
+
+    @classmethod
+    def get_video_url(cls, ip: Optional[str] = None) -> str:
         """Get the video stream URL.
-        
+
+        Args:
+            ip: Optional IP address of the camera.
+
         Returns:
-            Video stream URL from settings or default
+            Video stream URL from settings, built from the IP, or default
         """
-        from django.conf import settings
-        return getattr(settings, 'CAMERA_VIDEO_URL', cls.DEFAULT_VIDEO_URL)
+        return cls.build_video_url(ip)
     
     @classmethod
-    def get_frame_url(cls) -> str:
+    def get_frame_url(cls, ip: Optional[str] = None) -> str:
         """Get the frame capture URL.
-        
+
+        Args:
+            ip: Optional IP address of the camera.
+
         Returns:
-            Frame capture URL from settings or default
+            Frame capture URL from settings, built from the IP, or default
         """
-        from django.conf import settings
-        return getattr(settings, 'CAMERA_FRAME_URL', cls.DEFAULT_FRAME_URL)
+        return cls.build_frame_url(ip)
     
     @classmethod
-    def capture_frame(cls) -> Dict[str, Any]:
+    def _get_ffmpeg_path(cls) -> Optional[str]:
+        """Locate the ffmpeg executable.
+
+        Checks the system PATH first, then falls back to the bundled
+        ffmpeg build shipped inside the project root (or BASE_DIR).
+
+        Returns:
+            Path to ffmpeg.exe if found, None otherwise
+        """
+        exe = shutil.which('ffmpeg')
+        if exe:
+            return exe
+
+        from django.conf import settings
+        base_dir = getattr(settings, 'BASE_DIR', None) or os.getcwd()
+        project_root = os.path.abspath(os.path.join(base_dir, os.pardir))
+
+        patterns = [
+            os.path.join(project_root, 'ffmpeg-*', 'bin', 'ffmpeg.exe'),
+            os.path.join(project_root, 'ffmpeg-*', 'ffmpeg-*', 'bin', 'ffmpeg.exe'),
+            os.path.join(base_dir, 'ffmpeg-*', 'bin', 'ffmpeg.exe'),
+            os.path.join(base_dir, 'ffmpeg-*', 'ffmpeg-*', 'bin', 'ffmpeg.exe'),
+        ]
+
+        for pattern in patterns:
+            matches = glob.glob(pattern)
+            if matches:
+                logger.info(f"Using bundled ffmpeg: {matches[0]}")
+                return matches[0]
+
+        return None
+
+    @classmethod
+    def _grab_frame_from_stream(cls, ip: Optional[str] = None) -> Optional[bytes]:
+        """Grab a single JPEG frame from the MJPEG video stream using ffmpeg.
+
+        Some IP cameras (e.g. DroidCam) only expose a live MJPEG stream at
+        ``/video`` and do not serve a still-frame endpoint, so we extract a
+        single frame from the stream directly.
+
+        Args:
+            ip: Optional IP address of the camera.
+
+        Returns:
+            Raw JPEG bytes if a frame was captured, otherwise None.
+        """
+        ffmpeg_path = cls._get_ffmpeg_path()
+        if not ffmpeg_path:
+            logger.error("FFmpeg not found; cannot grab frame from stream")
+            return None
+
+        video_url = cls.get_video_url(ip)
+        out_path = os.path.join(os.environ.get('TEMP', '/tmp'), f"camframe_{int(time.time() * 1000)}.jpg")
+        logger.info(f"Grabbing frame from stream: {video_url}")
+
+        try:
+            # -loglevel error silences ffmpeg's banner; -nostdin avoids hangs
+            cmd = f'"{ffmpeg_path}" -loglevel error -nostdin -y -i "{video_url}" -frames:v 1 -q:v 2 -update 1 "{out_path}"'
+            subprocess.call(cmd, shell=True, timeout=cls.REQUEST_TIMEOUT + 5)
+
+            if not os.path.exists(out_path):
+                logger.error("FFmpeg did not produce a frame file")
+                return None
+
+            with open(out_path, "rb") as f:
+                data = f.read()
+            return data or None
+
+        except Exception as e:
+            logger.error(f"Failed to grab frame from stream: {e}")
+            return None
+        finally:
+            try:
+                if os.path.exists(out_path):
+                    os.remove(out_path)
+            except OSError:
+                pass
+
+    @classmethod
+    def capture_frame(cls, ip: Optional[str] = None) -> Dict[str, Any]:
         """Capture a single frame from the IP camera.
-        
+
+        First attempts the standard still-frame endpoint (``/cam/1/frame.jpg``).
+        If the camera does not provide one, falls back to extracting a frame
+        from the live MJPEG stream using ffmpeg.
+
+        Args:
+            ip: Optional IP address of the camera.
+
         Returns:
             Dictionary with 'success', 'image_data', and optional 'error' keys
         """
-        frame_url = cls.get_frame_url()
-        
+        frame_url = cls.get_frame_url(ip)
         try:
             logger.info(f"Capturing frame from: {frame_url}")
             resp = requests.get(frame_url, timeout=cls.REQUEST_TIMEOUT)
             resp.raise_for_status()
-            
+
+            if not resp.content:
+                raise requests.exceptions.RequestException("Empty frame from camera")
+
             return {
                 'success': True,
                 'image_data': resp.content
             }
-            
-        except requests.exceptions.Timeout:
-            error_msg = f"Camera connection timed out after {cls.REQUEST_TIMEOUT}s"
-            logger.error(error_msg)
-            return {
-                'success': False,
-                'error': error_msg
-            }
-            
-        except requests.exceptions.ConnectionError:
-            error_msg = f"Could not connect to camera at {frame_url}"
-            logger.error(error_msg)
-            return {
-                'success': False,
-                'error': error_msg
-            }
-            
+
         except requests.exceptions.RequestException as e:
-            error_msg = f"Camera request failed: {str(e)}"
-            logger.error(error_msg)
-            return {
-                'success': False,
-                'error': error_msg
-            }
-    
+            # Standard snapshot endpoint failed -> try grabbing from MJPEG stream.
+            logger.warning(f"Snapshot endpoint failed ({e}); trying MJPEG stream grab")
+            image_data = cls._grab_frame_from_stream(ip)
+            if image_data is None:
+                error_msg = (
+                    f"Could not capture a frame from the camera. "
+                    f"Snapshot ({frame_url}) failed and no MJPEG stream frame was returned."
+                )
+                logger.error(error_msg)
+                return {'success': False, 'error': error_msg}
+            return {'success': True, 'image_data': image_data}
+
+    @classmethod
+    def test_connection(cls, ip: Optional[str] = None) -> Dict[str, Any]:
+        """Check whether the IP camera is reachable.
+
+        Attempts to capture a frame (still endpoint first, then the live
+        MJPEG stream). This is used to verify a camera is actually connected
+        before saving the IP address.
+
+        Args:
+            ip: Optional IP address of the camera to check.
+
+        Returns:
+            Dictionary with 'success', 'video_url', and optional 'error' keys.
+        """
+        video_url = cls.get_video_url(ip)
+
+        result = cls.capture_frame(ip)
+        if result.get('success'):
+            return {'success': True, 'video_url': video_url}
+
+        return {
+            'success': False,
+            'error': result.get('error', 'Could not connect to the camera.'),
+            'video_url': video_url,
+        }
+
     @classmethod
     def save_frame(cls, image_data: bytes) -> Dict[str, Any]:
         """Save a captured frame to the media directory.
@@ -135,16 +297,19 @@ class CameraService:
             }
     
     @classmethod
-    def capture_and_save(cls) -> Dict[str, Any]:
+    def capture_and_save(cls, ip: Optional[str] = None) -> Dict[str, Any]:
         """Capture a frame from the camera and save it.
         
         Convenience method that combines capture_frame and save_frame.
+
+        Args:
+            ip: Optional IP address of the camera.
         
         Returns:
             Dictionary with capture and save results
         """
         # Capture frame
-        capture_result = cls.capture_frame()
+        capture_result = cls.capture_frame(ip)
         if not capture_result['success']:
             return capture_result
         

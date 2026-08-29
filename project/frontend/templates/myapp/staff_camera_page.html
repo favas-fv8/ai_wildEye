@@ -19,6 +19,17 @@
 
   <div class="card card-raised">
     <div class="card-body">
+      <div class="mb-3">
+        <label for="camera-ip" class="form-label"><strong>IP Camera Address</strong></label>
+        <div class="d-flex gap-2">
+          <input type="text" id="camera-ip" class="form-control" placeholder="e.g. 192.168.2.173"
+                 value="{{ camera_ip|default:'' }}">
+          <button type="button" class="btn btn-secondary no-loading" id="connect-btn">
+            Connect
+          </button>
+        </div>
+        <small class="text-muted">Enter the IP address of your IP camera and click Connect.</small>
+      </div>
       <div class="row">
         <div class="col col-md-7">
           <div class="live-stream-wrapper">
@@ -55,6 +66,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusDiv = document.getElementById("status");
     const lastCaptureDiv = document.getElementById("last-capture");
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const connectBtn = document.getElementById("connect-btn");
+    const ipInput = document.getElementById("camera-ip");
+    const liveStream = document.getElementById("live-stream");
+
+    connectBtn.addEventListener("click", function () {
+        const ip = ipInput.value.trim();
+        if (!ip) {
+            statusDiv.innerHTML = '<div class="alert alert-danger">Please enter an IP address.</div>';
+            return;
+        }
+        connectBtn.disabled = true;
+        statusDiv.innerHTML = '<div class="d-flex align-items-center gap-2"><span class="spinner"></span> <span>Connecting...</span></div>';
+
+        fetch("{% url 'set_camera_ip' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: "ip=" + encodeURIComponent(ip),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                liveStream.src = data.video_url;
+                statusDiv.innerHTML = '<div class="alert alert-success">Connected to ' + ip + '</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Error: ' + (data.message || "Unknown error") + '</div>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            statusDiv.innerHTML = '<div class="alert alert-danger">Request failed.</div>';
+        })
+        .finally(function () {
+            connectBtn.disabled = false;
+        });
+    });
 
     captureBtn.addEventListener("click", function () {
         statusDiv.innerHTML = '<div class="d-flex align-items-center gap-2"><span class="spinner"></span> <span>Capturing and analyzing...</span></div>';

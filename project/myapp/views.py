@@ -334,24 +334,60 @@ def admin_staff_user_view(request):
 
 # Camera views using CameraService and MLService
 
+# Session key used to remember the IP camera address the user selects.
+SESSION_CAMERA_IP = "camera_ip"
+
+
+def _get_session_camera_ip(request):
+    """Return the camera IP stored in the user's session, or None."""
+    return request.session.get(SESSION_CAMERA_IP)
+
+
+@require_POST
+def set_camera_ip(request):
+    """Verify and store the user-provided IP camera address in the session.
+
+    The camera is tested for connectivity first. Only if it is reachable is
+    the IP saved and a success message returned.
+    """
+    ip = request.POST.get("ip", "").strip()
+    if not ip:
+        return JsonResponse(
+            {"success": False, "message": "Please enter an IP address."},
+            status=400,
+        )
+
+    connection = CameraService.test_connection(ip)
+    if not connection['success']:
+        return JsonResponse(
+            {"success": False, "message": connection.get('error', 'Could not connect to camera.')},
+            status=400,
+        )
+
+    request.session[SESSION_CAMERA_IP] = ip
+    return JsonResponse({"success": True, "video_url": connection['video_url']})
+
 
 def admin_camera_page(request):
     """Show live video and a button to capture a snapshot (Admin)."""
-    video_url = CameraService.get_video_url()
-    return render(request, "myapp/admin_camera_page.html", {"video_url": video_url})
+    ip = _get_session_camera_ip(request)
+    video_url = CameraService.get_video_url(ip)
+    return render(request, "myapp/admin_camera_page.html", {"video_url": video_url, "camera_ip": ip})
 
 
 def camera_page(request):
     """Show live video and a button to capture a snapshot."""
-    video_url = CameraService.get_video_url()
-    return render(request, "myapp/camera_page.html", {"video_url": video_url})
+    ip = _get_session_camera_ip(request)
+    video_url = CameraService.get_video_url(ip)
+    return render(request, "myapp/camera_page.html", {"video_url": video_url, "camera_ip": ip})
 
 
 @require_POST
 def save_frame(request):
     """Capture a frame from IP camera, analyze it, and return results."""
     # Capture and save frame
-    result = CameraService.capture_and_save()
+    ip = _get_session_camera_ip(request)
+    result = CameraService.capture_and_save(ip)
     
     if not result['success']:
         return JsonResponse({"success": False, "message": result['error']}, status=500)
@@ -539,21 +575,24 @@ def staff_test_history_view(request):
 
 def staff_camera_page(request):
     """Show live video and a button to capture a snapshot (Staff)."""
-    video_url = CameraService.get_video_url()
-    return render(request, "myapp/staff_camera_page.html", {"video_url": video_url})
+    ip = _get_session_camera_ip(request)
+    video_url = CameraService.get_video_url(ip)
+    return render(request, "myapp/staff_camera_page.html", {"video_url": video_url, "camera_ip": ip})
 
 
 def staff_live_page(request):
     """Show live camera feed with auto-capture (Staff)."""
-    video_url = CameraService.get_video_url()
-    return render(request, "myapp/staff_live_page.html", {"video_url": video_url})
+    ip = _get_session_camera_ip(request)
+    video_url = CameraService.get_video_url(ip)
+    return render(request, "myapp/staff_live_page.html", {"video_url": video_url, "camera_ip": ip})
 
 
 @require_POST
 def staff_save_frame(request):
     """Capture frame, analyze, and send alerts if wild animal detected."""
     # Capture and save frame
-    result = CameraService.capture_and_save()
+    ip = _get_session_camera_ip(request)
+    result = CameraService.capture_and_save(ip)
     
     if not result['success']:
         return JsonResponse({"success": False, "message": result['error']}, status=500)
