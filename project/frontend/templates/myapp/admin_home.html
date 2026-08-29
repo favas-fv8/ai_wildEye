@@ -9,7 +9,7 @@
 </div>
 
 <div class="row fade-in">
-  <div class="col col-md-4">
+  <div class="col col-md-3">
     <a href="{% url 'admin_pic_pool_add' %}" class="card card-dashboard card-info" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Image Analysis</h3>
@@ -17,7 +17,7 @@
       </div>
     </a>
   </div>
-  <div class="col col-md-4">
+  <div class="col col-md-3">
     <a href="{% url 'admin_pic_pool_video_add' %}" class="card card-dashboard card-success" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Video Analysis</h3>
@@ -25,11 +25,19 @@
       </div>
     </a>
   </div>
-  <div class="col col-md-4">
+  <div class="col col-md-3">
     <a href="{% url 'admin_camera_page' %}" class="card card-dashboard card-warning" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Camera Capture</h3>
         <p class="card-text">Capture and analyze frames from IP camera</p>
+      </div>
+    </a>
+  </div>
+  <div class="col col-md-3">
+    <a href="{% url 'admin_live_page' %}" class="card card-dashboard card-danger" style="text-decoration:none;">
+      <div class="card-body">
+        <h3 class="card-title">Live Camera</h3>
+        <p class="card-text">View live camera feed with alerts</p>
       </div>
     </a>
   </div>

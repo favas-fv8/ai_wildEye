@@ -1,0 +1,200 @@
+{% extends 'myapp/admin_base.html' %}
+{% load static %}
+{% block title %}Live Camera - Ai-WildEye{% endblock %}
+
+{% block body %}
+<div class="container fade-in" style="max-width: 1000px;">
+  <div class="page-header">
+    <h2>Live Camera Monitoring</h2>
+    <p class="page-subtitle">Continuous capture and analysis every 4 seconds</p>
+  </div>
+
+  {% if msg %}
+  <div class="alert alert-info alert-dismissible" role="alert">
+    <div class="alert-content">{{ msg }}</div>
+    <button type="button" class="alert-close" aria-label="Close">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  {% endif %}
+
+  <div class="card card-raised">
+    <div class="card-body">
+      <div class="mb-3">
+        <label for="camera-ip" class="form-label"><strong>IP Camera Address</strong></label>
+        <div class="d-flex gap-2">
+          <input type="text" id="camera-ip" class="form-control" placeholder="e.g. 192.168.2.173"
+                 value="{{ camera_ip|default:'' }}">
+          <button type="button" class="btn btn-secondary no-loading" id="connect-btn">
+            Connect
+          </button>
+          <button type="button" class="btn btn-outline-danger no-loading" id="disconnect-btn">
+            Disconnect
+          </button>
+        </div>
+        <small class="text-muted">Enter the IP address of your IP camera and click Connect.</small>
+      </div>
+      <div class="row">
+        <div class="col col-md-7">
+          <div class="live-stream-wrapper">
+            <span class="live-stream-badge">Live</span>
+            <img id="live-stream" src="{{ video_url }}" alt="Live Camera Stream">
+          </div>
+        </div>
+        <div class="col col-md-5">
+          <div class="mb-3">
+            <strong>Detection Results</strong>
+          </div>
+          <div id="status" class="mb-3" style="min-height: 40px;">
+            <p class="text-muted">Click Start to begin live monitoring</p>
+          </div>
+          <div id="last-capture" class="mb-3"></div>
+          <form id="capture-form" method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-success flex-1 no-loading" id="start-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Start Monitoring
+              </button>
+              <button type="button" class="btn btn-danger flex-1 no-loading" id="stop-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                Stop
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusDiv = document.getElementById("status");
+    const lastCaptureDiv = document.getElementById("last-capture");
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const startBtn = document.getElementById("start-btn");
+    const stopBtn = document.getElementById("stop-btn");
+    const connectBtn = document.getElementById("connect-btn");
+    const disconnectBtn = document.getElementById("disconnect-btn");
+    const ipInput = document.getElementById("camera-ip");
+    const liveStream = document.getElementById("live-stream");
+
+    connectBtn.addEventListener("click", function () {
+        const ip = ipInput.value.trim();
+        if (!ip) {
+            statusDiv.innerHTML = '<div class="alert alert-danger">Please enter an IP address.</div>';
+            return;
+        }
+        connectBtn.disabled = true;
+        statusDiv.innerHTML = '<div class="d-flex align-items-center gap-2"><span class="spinner"></span> <span>Connecting...</span></div>';
+
+        fetch("{% url 'set_camera_ip' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: "ip=" + encodeURIComponent(ip),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                liveStream.src = data.video_url;
+                statusDiv.innerHTML = '<div class="alert alert-success">Connected to ' + ip + '</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Error: ' + (data.message || "Unknown error") + '</div>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            statusDiv.innerHTML = '<div class="alert alert-danger">Request failed.</div>';
+        })
+        .finally(function () {
+            connectBtn.disabled = false;
+        });
+    });
+
+    let intervalId = null;
+
+    startBtn.addEventListener("click", function() {
+        if (intervalId !== null) return;
+        
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+
+        intervalId = setInterval(function() {
+            statusDiv.innerHTML = '<div class="d-flex align-items-center gap-2"><span class="spinner"></span> <span>Capturing...</span></div>';
+
+            fetch("{% url 'admin_save_frame' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrftoken,
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+                    lastCaptureDiv.innerHTML = '<img src="../static/myapp' + data.file_url + '" class="media-thumb-lg" style="max-width:100%; border-radius: 8px;" alt="Captured frame">';
+                } else {
+                    statusDiv.innerHTML = '<div class="alert alert-danger">Error: ' + (data.message || "Unknown error") + '</div>';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                statusDiv.innerHTML = '<div class="alert alert-danger">Request failed.</div>';
+            });
+        }, 4000);
+    });
+
+    stopBtn.addEventListener("click", function() {
+        clearInterval(intervalId);
+        intervalId = null;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        statusDiv.innerHTML = '<p class="text-muted">Monitoring stopped</p>';
+    });
+
+    disconnectBtn.addEventListener("click", function () {
+        if (intervalId !== null) {
+            clearInterval(intervalId);
+            intervalId = null;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+        disconnectBtn.disabled = true;
+        statusDiv.innerHTML = '<div class="d-flex align-items-center gap-2"><span class="spinner"></span> <span>Disconnecting...</span></div>';
+
+        fetch("{% url 'disconnect_camera' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                liveStream.removeAttribute("src");
+                lastCaptureDiv.innerHTML = '';
+                statusDiv.innerHTML = '<div class="alert alert-warning">' + (data.message || "Camera disconnected") + '</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Error: ' + (data.message || "Unknown error") + '</div>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            statusDiv.innerHTML = '<div class="alert alert-danger">Request failed.</div>';
+        })
+        .finally(function () {
+            disconnectBtn.disabled = false;
+        });
+    });
+});
+</script>
+{% endblock %}

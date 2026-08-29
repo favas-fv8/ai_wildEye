@@ -386,6 +386,62 @@ def admin_camera_page(request):
     return render(request, "myapp/admin_camera_page.html", {"video_url": video_url, "camera_ip": ip})
 
 
+def admin_live_page(request):
+    """Show live camera feed with auto-capture (Admin)."""
+    ip = _get_session_camera_ip(request)
+    video_url = CameraService.get_video_url(ip)
+    return render(request, "myapp/admin_live_page.html", {"video_url": video_url, "camera_ip": ip})
+
+
+@require_POST
+def admin_save_frame(request):
+    """Capture frame, analyze, and send alerts if wild animal detected (Admin)."""
+    # Capture and save frame
+    ip = _get_session_camera_ip(request)
+    result = CameraService.capture_and_save(ip)
+
+    if not result['success']:
+        return JsonResponse({"success": False, "message": result['error']}, status=500)
+
+    # Run ML prediction
+    result_d = MLService.predict_from_file(input_image=result['filepath'])
+
+    message = f"Predicted Animal: {result_d['animal']} ({result_d['match']} confidence)"
+
+    # Check for wild animal and trigger alerts
+    if result_d['animal'] in ALERT_LABELS:
+        # Play alert sound
+        try:
+            from playsound import playsound
+            audio_path = os.path.join(BASE_DIR, 'backend/audio/alert.mp3')
+            if os.path.exists(audio_path):
+                playsound(audio_path)
+        except Exception as e:
+            logger.warning(f"Failed to play alert sound: {e}")
+
+        # Send email alerts
+        email_list = category_settings.objects.all()
+        for email in email_list:
+            EmailService.send_mail("Alert", message, email.category_name)
+
+    # Save live detection to admin's history (image_pool)
+    dt = datetime.today().strftime('%Y-%m-%d')
+    tm = datetime.today().strftime('%H:%M:%S')
+    pic_obj = image_pool(
+        pic_path=f'captures/{result["filename"]}',
+        result=result_d['animal'], category_id=1,
+        dt=dt, tm=tm, d_type='live'
+    )
+    pic_obj.save()
+
+    return JsonResponse({
+        "success": True,
+        "message": message,
+        "filename": result['filename'],
+        "file_url": result['file_url'],
+    })
+
+
 def camera_page(request):
     """Show live video and a button to capture a snapshot."""
     ip = _get_session_camera_ip(request)
@@ -639,6 +695,15 @@ def staff_save_frame(request):
         status=result_d['animal'], d_type='live'
     )
     th_obj.save()
+    
+    # Also save to image_pool so the live capture appears in the admin's
+    # Test History (admin page reads from image_pool, staff from test_history).
+    pic_obj = image_pool(
+        pic_path=f'captures/{result["filename"]}',
+        result=result_d['animal'], category_id=1,
+        dt=dt, tm=tm, d_type='live'
+    )
+    pic_obj.save()
     
     return JsonResponse({
         "success": True,
