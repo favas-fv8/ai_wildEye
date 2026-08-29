@@ -43,6 +43,7 @@ urlpatterns = [
 
     path('admin_camera_page', views.admin_camera_page, name='admin_camera_page'),
     path('set_camera_ip', views.set_camera_ip, name='set_camera_ip'),
+    path('disconnect_camera', views.disconnect_camera, name='disconnect_camera'),
     
 
     path('staff_login', views.staff_login, name='staff_login'),

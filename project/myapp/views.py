@@ -368,6 +368,17 @@ def set_camera_ip(request):
     return JsonResponse({"success": True, "video_url": connection['video_url']})
 
 
+@require_POST
+def disconnect_camera(request):
+    """Disconnect the currently connected IP camera.
+
+    Clears the camera IP from the session so the app no longer captures
+    from the previously selected camera.
+    """
+    request.session.pop(SESSION_CAMERA_IP, None)
+    return JsonResponse({"success": True, "message": "Camera disconnected."})
+
+
 def admin_camera_page(request):
     """Show live video and a button to capture a snapshot (Admin)."""
     ip = _get_session_camera_ip(request)

@@ -50,6 +50,21 @@ class CameraService:
         return None
 
     @classmethod
+    def build_base_url(cls, ip: Optional[str] = None) -> str:
+        """Build the base HTTP URL for an IP camera.
+
+        Args:
+            ip: The IP camera address. If None, falls back to settings/default.
+
+        Returns:
+            The base camera URL string (without path).
+        """
+        effective_ip = cls._resolve_ip(ip)
+        if effective_ip is None:
+            return f"http://{cls.DEFAULT_IP}:{cls.IP_PORT}"
+        return f"http://{effective_ip}:{cls.IP_PORT}"
+
+    @classmethod
     def build_video_url(cls, ip: Optional[str] = None) -> str:
         """Build a video stream URL from an IP address.
 
@@ -229,9 +244,10 @@ class CameraService:
     def test_connection(cls, ip: Optional[str] = None) -> Dict[str, Any]:
         """Check whether the IP camera is reachable.
 
-        Attempts to capture a frame (still endpoint first, then the live
-        MJPEG stream). This is used to verify a camera is actually connected
-        before saving the IP address.
+        Contacts the camera's base HTTP page, which responds quickly and does
+        not consume the live MJPEG stream (frame grabbing would compete with
+        the browser's live feed on single-stream cameras). This is used to
+        verify a camera is actually connected before saving the IP address.
 
         Args:
             ip: Optional IP address of the camera to check.
@@ -240,16 +256,28 @@ class CameraService:
             Dictionary with 'success', 'video_url', and optional 'error' keys.
         """
         video_url = cls.get_video_url(ip)
+        base_url = cls.build_base_url(ip)
 
-        result = cls.capture_frame(ip)
-        if result.get('success'):
+        try:
+            logger.info(f"Testing camera connection at: {base_url}")
+            resp = requests.get(base_url, timeout=cls.REQUEST_TIMEOUT)
+            resp.raise_for_status()
             return {'success': True, 'video_url': video_url}
 
-        return {
-            'success': False,
-            'error': result.get('error', 'Could not connect to the camera.'),
-            'video_url': video_url,
-        }
+        except requests.exceptions.Timeout:
+            error_msg = "Camera connection timed out. Check the IP address and that the camera is online."
+            logger.error(error_msg)
+            return {'success': False, 'error': error_msg, 'video_url': video_url}
+
+        except requests.exceptions.ConnectionError:
+            error_msg = f"Could not connect to camera at {base_url}. Check the IP address and network."
+            logger.error(error_msg)
+            return {'success': False, 'error': error_msg, 'video_url': video_url}
+
+        except requests.exceptions.RequestException as e:
+            error_msg = f"Camera connection failed: {str(e)}"
+            logger.error(error_msg)
+            return {'success': False, 'error': error_msg, 'video_url': video_url}
 
     @classmethod
     def save_frame(cls, image_data: bytes) -> Dict[str, Any]:

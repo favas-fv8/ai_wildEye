@@ -28,6 +28,9 @@
           <button type="button" class="btn btn-secondary no-loading" id="connect-btn">
             Connect
           </button>
+          <button type="button" class="btn btn-outline-danger no-loading" id="disconnect-btn">
+            Disconnect
+          </button>
         </div>
         <small class="text-muted">Enter the IP address of your IP camera and click Connect.</small>
       </div>
@@ -75,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const startBtn = document.getElementById("start-btn");
     const stopBtn = document.getElementById("stop-btn");
     const connectBtn = document.getElementById("connect-btn");
+    const disconnectBtn = document.getElementById("disconnect-btn");
     const ipInput = document.getElementById("camera-ip");
     const liveStream = document.getElementById("live-stream");
 
@@ -154,6 +158,42 @@ document.addEventListener('DOMContentLoaded', function() {
         startBtn.disabled = false;
         stopBtn.disabled = true;
         statusDiv.innerHTML = '<p class="text-muted">Monitoring stopped</p>';
+    });
+
+    disconnectBtn.addEventListener("click", function () {
+        if (intervalId !== null) {
+            clearInterval(intervalId);
+            intervalId = null;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+        disconnectBtn.disabled = true;
+        statusDiv.innerHTML = '<div class="d-flex align-items-center gap-2"><span class="spinner"></span> <span>Disconnecting...</span></div>';
+
+        fetch("{% url 'disconnect_camera' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                liveStream.removeAttribute("src");
+                lastCaptureDiv.innerHTML = '';
+                statusDiv.innerHTML = '<div class="alert alert-warning">' + (data.message || "Camera disconnected") + '</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Error: ' + (data.message || "Unknown error") + '</div>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            statusDiv.innerHTML = '<div class="alert alert-danger">Request failed.</div>';
+        })
+        .finally(function () {
+            disconnectBtn.disabled = false;
+        });
     });
 });
 </script>
