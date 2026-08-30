@@ -875,10 +875,23 @@ select.form-control {
   text-align: left;
 }
 
+.auth-card .form-group + .form-group {
+  margin-top: var(--space-5);
+}
+
+.auth-card .form-label {
+  margin-bottom: var(--space-2);
+}
+
 .auth-card .btn {
   width: 100%;
   padding: var(--space-3);
   font-size: var(--font-size-base);
+}
+
+.auth-card .btn + .btn,
+.auth-card .btn ~ .btn {
+  margin-top: var(--space-4);
 }
 
 /* ========================================

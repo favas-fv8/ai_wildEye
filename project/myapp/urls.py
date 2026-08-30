@@ -56,6 +56,7 @@ urlpatterns = [
 
     path('staff_test_history_add', views.staff_test_history_add, name='staff_test_history_add'),
     path('staff_test_history_view', views.staff_test_history_view, name='staff_test_history_view'),
+    path('staff_test_history_delete', views.staff_test_history_delete, name='staff_test_history_delete'),
     path('staff_test_history_video_add', views.staff_test_history_video_add,name='staff_test_history_video_add'),
 
     path('staff_camera_page', views.staff_camera_page, name='staff_camera_page'),

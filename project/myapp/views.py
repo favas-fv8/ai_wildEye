@@ -638,6 +638,28 @@ def staff_test_history_view(request):
     return render(request, 'myapp/staff_test_history_view.html', context)
 
 
+def staff_test_history_delete(request):
+    """Delete a staff test history record."""
+    id = request.GET.get('id')
+    logger.info(f"Deleting staff test history record with id: {id}")
+
+    staff_id = int(request.session.get(AuthService.SESSION_USER_ID))
+    th = test_history.objects.filter(id=int(id), staff_id=staff_id).first()
+    if th:
+        th.delete()
+
+    test_l = test_history.objects.filter(staff_id=staff_id)
+
+    d_type = request.GET.get('type', '')
+    if d_type in ('image', 'video', 'live'):
+        test_l = test_l.filter(d_type=d_type)
+
+    test_l = test_l.order_by('-id')[:20]
+
+    context = {'test_list': test_l, 'current_filter': d_type}
+    return render(request, 'myapp/staff_test_history_view.html', context)
+
+
 
 
 def staff_camera_page(request):

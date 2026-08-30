@@ -5,14 +5,18 @@
 {% block body %}
 <div class="container fade-in">
   <div class="mb-3">
-    <a id="btn-back" class="btn btn-outline-secondary" href="{% url 'admin_home' %}" onclick="if (window.history.length > 1) { history.back(); return false; }">
+    <a id="btn-back" class="btn btn-secondary" href="{% url 'admin_home' %}" onclick="if (window.history.length > 1) { history.back(); return false; }">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
       Back
     </a>
   </div>
 
-  <div class="page-header">
-    <h2>Test History</h2>
+  <div class="card card-raised no-hover mb-4">
+    <div class="card-body">
+      <div class="page-header" style="margin-bottom:0;">
+        <h2>Test History</h2>
+      </div>
+    </div>
   </div>
 
   {% if msg %}
