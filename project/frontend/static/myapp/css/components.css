@@ -257,12 +257,57 @@
 
 .card-dashboard {
   border-left: 4px solid var(--color-primary);
+  background-color: var(--color-gray-50);
 }
 
-.card-dashboard.card-success { border-left-color: var(--color-success); }
-.card-dashboard.card-warning { border-left-color: var(--color-warning); }
-.card-dashboard.card-danger { border-left-color: var(--color-danger); }
-.card-dashboard.card-info { border-left-color: var(--color-info); }
+.card-dashboard.card-success { border-left-color: var(--color-success); background-color: var(--color-success-bg); }
+.card-dashboard.card-warning { border-left-color: var(--color-warning); background-color: var(--color-warning-bg); }
+.card-dashboard.card-danger { border-left-color: var(--color-danger); background-color: var(--color-danger-bg); }
+.card-dashboard.card-info { border-left-color: var(--color-info); background-color: var(--color-info-bg); }
+
+.card-solid {
+  color: #ffffff;
+  border-left-width: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.card-solid.card-solid-info, .card-solid.card-solid-success, .card-solid.card-solid-warning, .card-solid.card-solid-danger, .card-solid.card-solid-purple, .card-solid.card-solid-orange, .card-solid.card-solid-teal, .card-solid.card-solid-dark {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.card-solid .card-title,
+.card-solid .card-text {
+  color: inherit;
+}
+.card-solid .card-body {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 40%, #eceff1 100%) !important;
+  color: #212529;
+  border-radius: var(--border-radius-lg);
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.card-solid .card-body .card-title,
+.card-solid .card-body .card-text {
+  color: #212529;
+}
+.card-solid:hover .card-body {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f3f5 40%, #dee2e6 100%) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+}
+
+.card.no-hover,
+.card-raised.no-hover {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+.card.no-hover:hover,
+.card-raised.no-hover:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
 
 /* ========================================
    TABLES

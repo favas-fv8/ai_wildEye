@@ -3,14 +3,18 @@
 {% block title %}Staff Dashboard - Ai-WildEye{% endblock %}
 
 {% block body %}
-<div class="page-header fade-in">
-  <h1>Welcome, {{ uname }}</h1>
-  <p class="page-subtitle">Your wildlife detection workspace</p>
+<div class="card card-raised mb-4 fade-in no-hover" style="max-width: 400px; border-radius: 0;">
+  <div class="card-body" style="padding-top: 8px; padding-bottom: 8px;">
+    <div class="page-header" style="margin-bottom:0;">
+      <h1>Welcome, {{ uname }}</h1>
+      <p class="page-subtitle">Your wildlife detection workspace</p>
+    </div>
+  </div>
 </div>
 
 <div class="row fade-in">
   <div class="col col-md-3">
-    <a href="{% url 'staff_test_history_add' %}" class="card card-dashboard card-info" style="text-decoration:none;">
+    <a href="{% url 'staff_test_history_add' %}" class="card card-dashboard card-solid card-solid-info" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Image Analysis</h3>
         <p class="card-text">Upload an image for animal detection</p>
@@ -18,7 +22,7 @@
     </a>
   </div>
   <div class="col col-md-3">
-    <a href="{% url 'staff_test_history_video_add' %}" class="card card-dashboard card-success" style="text-decoration:none;">
+    <a href="{% url 'staff_test_history_video_add' %}" class="card card-dashboard card-solid card-solid-success" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Video Analysis</h3>
         <p class="card-text">Upload a video for animal detection</p>
@@ -26,7 +30,7 @@
     </a>
   </div>
   <div class="col col-md-3">
-    <a href="{% url 'staff_camera_page' %}" class="card card-dashboard card-warning" style="text-decoration:none;">
+    <a href="{% url 'staff_camera_page' %}" class="card card-dashboard card-solid card-solid-warning" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Camera Capture</h3>
         <p class="card-text">Capture a frame from IP camera</p>
@@ -34,7 +38,7 @@
     </a>
   </div>
   <div class="col col-md-3">
-    <a href="{% url 'staff_live_page' %}" class="card card-dashboard card-danger" style="text-decoration:none;">
+    <a href="{% url 'staff_live_page' %}" class="card card-dashboard card-solid card-solid-danger" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Live Camera</h3>
         <p class="card-text">View live camera feed with alerts</p>
@@ -45,7 +49,7 @@
 
 <div class="row mt-4 fade-in">
   <div class="col col-md-6">
-    <a href="{% url 'staff_test_history_view' %}" class="card card-dashboard" style="text-decoration:none;">
+    <a href="{% url 'staff_test_history_view' %}" class="card card-dashboard card-solid card-solid-purple" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Test History</h3>
         <p class="card-text">View your previous analysis results</p>
@@ -53,7 +57,7 @@
     </a>
   </div>
   <div class="col col-md-6">
-    <a href="{% url 'staff_changepassword' %}" class="card card-dashboard" style="text-decoration:none;">
+    <a href="{% url 'staff_changepassword' %}" class="card card-dashboard card-solid card-solid-orange" style="text-decoration:none;">
       <div class="card-body">
         <h3 class="card-title">Change Password</h3>
         <p class="card-text">Update your account password</p>
