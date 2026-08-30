@@ -25,6 +25,7 @@ from .services.camera_service import CameraService
 from .services.email_service import EmailService
 from .services.video_service import VideoService
 from .services.auth_service import AuthService
+from .services.model_metrics_service import ModelMetricsService
 
 logger = logging.getLogger(__name__)
 
@@ -297,6 +298,16 @@ def admin_pic_pool_view(request):
     
     context = {'pic_list': pp_l, 'category_list': cmd, 'current_filter': d_type}
     return render(request, 'myapp/admin_pic_pool_view.html', context)
+
+
+def admin_model_performance(request):
+    """Render the admin page showing the latest trained model's performance.
+
+    Reads the metrics file written by the training pipeline so the page
+    always reflects the most recently trained model.
+    """
+    context = ModelMetricsService.get_context()
+    return render(request, 'myapp/model_performance.html', context)
 
 def admin_staff_user_add(request):
     """Add a new staff user."""

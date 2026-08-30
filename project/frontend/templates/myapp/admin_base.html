@@ -44,6 +44,7 @@
             </div>
           </li>
           <li><a class="nav-link" href="{% url 'admin_category_settings_view' %}">Email Settings</a></li>
+          <li><a class="nav-link" href="{% url 'admin_model_performance' %}">AI Model</a></li>
           <li class="dropdown">
             <a class="nav-link" href="#" role="button" aria-haspopup="true" aria-expanded="false">
               Account
@@ -63,7 +64,7 @@
       </div>
     </header>
 
-    <main id="main-content" class="main-content" {% block background %}{% endblock %}>
+    <main id="main-content" class="main-content" {% block background %}style="background-image:url('{% static 'myapp/images/about.jpg' %}'); background-repeat:no-repeat; background-position:center; background-size:cover; background-attachment:fixed;"{% endblock %}>
       {% block body %}{% endblock %}
     </main>
 

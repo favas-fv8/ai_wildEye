@@ -36,6 +36,7 @@ urlpatterns = [
     path('admin_pic_pool_video_add', views.admin_pic_pool_video_add,name='admin_pic_pool_video_add'),
     path('admin_pic_pool_view', views.admin_pic_pool_view, name='admin_pic_pool_view'),
     path('admin_pic_pool_delete', views.admin_pic_pool_delete, name='admin_pic_pool_delete'),
+    path('admin_model_performance', views.admin_model_performance, name='admin_model_performance'),
 
     path('admin_staff_user_add', views.admin_staff_user_add, name='admin_staff_user_add'),
     path('admin_staff_user_view', views.admin_staff_user_view, name='admin_staff_user_view'),

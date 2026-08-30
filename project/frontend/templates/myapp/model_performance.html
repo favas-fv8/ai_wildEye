@@ -1,0 +1,191 @@
+{% extends 'myapp/admin_base.html' %}
+{% load static %}
+{% block title %}Model Performance - Ai-WildEye{% endblock %}
+
+{% block body %}
+<div class="container fade-in">
+  <div class="mb-3">
+    <a id="btn-back" class="btn btn-secondary" href="{% url 'admin_home' %}" onclick="if (window.history.length > 1) { history.back(); return false; }">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+  </div>
+
+  <div class="card card-raised no-hover mb-4">
+    <div class="card-body">
+      <div class="page-header" style="margin-bottom:0;">
+        <h2>Model Performance</h2>
+        <p class="page-subtitle">Latest trained model metrics, accuracy and confusion matrix</p>
+      </div>
+    </div>
+  </div>
+
+  {% if not available %}
+  <div class="card card-raised">
+    <div class="card-body">
+      <div class="empty-state">
+        <h3>No evaluation data available</h3>
+        <p>Run the training pipeline to generate model performance metrics.</p>
+        <pre class="text-left" style="background:var(--color-gray-50); padding:var(--space-4); border-radius:var(--border-radius-md); overflow:auto;">python manage.py train_model --epochs 5</pre>
+      </div>
+    </div>
+  </div>
+  {% else %}
+
+  <div class="card card-raised mb-4">
+    <div class="card-body">
+      <h3 class="card-title">Model Information</h3>
+      <div class="row mt-2">
+        <div class="col col-md-4">
+          <p><strong>Model:</strong> {{ model_name }}</p>
+        </div>
+        <div class="col col-md-4">
+          <p><strong>Version:</strong> <code>{{ version }}</code></p>
+        </div>
+        <div class="col col-md-4">
+          <p><strong>Trained:</strong> {{ generated_at }}</p>
+        </div>
+        <div class="col col-md-4">
+          <p><strong>Classes:</strong> {{ num_classes }}</p>
+        </div>
+        <div class="col col-md-4">
+          <p><strong>Train / Val samples:</strong> {{ train_samples }} / {{ val_samples }}</p>
+        </div>
+        <div class="col col-md-4">
+          <p><strong>Epochs × Batch:</strong> {{ epochs }} × {{ batch_size }}</p>
+        </div>
+        <div class="col col-md-4">
+          <p><strong>Input size:</strong> {{ input_size.0 }}×{{ input_size.1 }}×3</p>
+        </div>
+        <div class="col col-md-4">
+          <p><strong>Training time:</strong> {{ training_duration_seconds }}s</p>
+        </div>
+        <div class="col col-md-4">
+          <p><strong>Dataset:</strong> <code>{{ dataset_dir }}</code></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col col-md-3">
+      <div class="card card-dashboard card-solid card-solid-purple" style="text-decoration:none;">
+        <div class="card-body">
+          <h3 class="card-title">Accuracy</h3>
+          <p class="card-text" style="font-size:2rem; font-weight:700;">{{ accuracy }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-3">
+      <div class="card card-dashboard card-solid card-solid-info" style="text-decoration:none;">
+        <div class="card-body">
+          <h3 class="card-title">Macro Precision</h3>
+          <p class="card-text" style="font-size:2rem; font-weight:700;">{{ macro_precision }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-3">
+      <div class="card card-dashboard card-solid card-solid-success" style="text-decoration:none;">
+        <div class="card-body">
+          <h3 class="card-title">Macro Recall</h3>
+          <p class="card-text" style="font-size:2rem; font-weight:700;">{{ macro_recall }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-3">
+      <div class="card card-dashboard card-solid card-solid-warning" style="text-decoration:none;">
+        <div class="card-body">
+          <h3 class="card-title">Macro F1 Score</h3>
+          <p class="card-text" style="font-size:2rem; font-weight:700;">{{ macro_f1 }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col col-md-6">
+      <div class="card card-raised h-100">
+        <div class="card-body d-flex flex-column">
+          <h3 class="card-title">Confusion Matrix</h3>
+          {% if confusion_chart %}
+          <img src="{% static confusion_chart %}" alt="Confusion Matrix" style="width:100%; flex:1; object-fit:contain; border-radius:var(--border-radius-lg);">
+          {% else %}
+          <div class="table-responsive flex-grow-1">
+            <table class="table table-bordered table-sm text-center">
+              <thead>
+                <tr>
+                  <th>True \ Pred</th>
+                  {% for c in classes %}<th>{{ c }}</th>{% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in confusion_rows %}
+                <tr>
+                  <th scope="row">{{ entry.label }}</th>
+                  {% for cell in entry.row %}
+                  <td>{{ cell }}</td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-6">
+      <div class="card card-raised h-100">
+        <div class="card-body d-flex flex-column">
+          <h3 class="card-title">Training Curves</h3>
+          {% if curves_chart %}
+          <img src="{% static curves_chart %}" alt="Training Curves" style="width:100%; flex:1; object-fit:contain; border-radius:var(--border-radius-lg);">
+          {% else %}
+          <p class="card-text text-muted">No training curve image available.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-raised">
+    <div class="card-body">
+      <h3 class="card-title">Per-Class Metrics</h3>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Support</th>
+              <th>TP</th>
+              <th>FP</th>
+              <th>FN</th>
+              <th>TN</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in per_class %}
+            <tr>
+              <td><strong>{{ row.label }}</strong></td>
+              <td>{{ row.support }}</td>
+              <td>{{ row.tp }}</td>
+              <td>{{ row.fp }}</td>
+              <td>{{ row.fn }}</td>
+              <td>{{ row.tn }}</td>
+              <td>{{ row.precision }}</td>
+              <td>{{ row.recall }}</td>
+              <td>{{ row.f1_score }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

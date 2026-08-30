@@ -1,0 +1,253 @@
+{
+  "generated_at": "2026-08-30 22:16:52",
+  "model_name": "MobileNetV2 (fine-tuned)",
+  "model_file": "backend/ml/mobilenet_animal_classifier_cpu.h5",
+  "version": "20260830-221652",
+  "input_size": [
+    160,
+    160
+  ],
+  "num_classes": 8,
+  "classes": [
+    "Buffalo",
+    "ELEPHANT",
+    "LION",
+    "Rhino",
+    "Tiger",
+    "black",
+    "cat",
+    "dog"
+  ],
+  "dataset_dir": "D:\\web projects\\ai_wildEye\\project\\..\\ml_code\\Animal",
+  "train_samples": 16293,
+  "val_samples": 4852,
+  "epochs": 5,
+  "batch_size": 16,
+  "val_split": 0.2,
+  "training_duration_seconds": 1411.17,
+  "metrics": {
+    "labels": [
+      "Buffalo",
+      "ELEPHANT",
+      "LION",
+      "Rhino",
+      "Tiger",
+      "black",
+      "cat",
+      "dog"
+    ],
+    "overall": {
+      "accuracy": 0.9899,
+      "macro_precision": 0.9797,
+      "macro_recall": 0.9852,
+      "macro_f1": 0.982,
+      "samples": 4852
+    },
+    "per_class": [
+      {
+        "label": "Buffalo",
+        "tp": 892,
+        "fp": 0,
+        "fn": 18,
+        "tn": 3942,
+        "precision": 1.0,
+        "recall": 0.9802,
+        "f1_score": 0.99,
+        "support": 910
+      },
+      {
+        "label": "ELEPHANT",
+        "tp": 277,
+        "fp": 3,
+        "fn": 23,
+        "tn": 4549,
+        "precision": 0.9893,
+        "recall": 0.9233,
+        "f1_score": 0.9552,
+        "support": 300
+      },
+      {
+        "label": "LION",
+        "tp": 296,
+        "fp": 29,
+        "fn": 4,
+        "tn": 4523,
+        "precision": 0.9108,
+        "recall": 0.9867,
+        "f1_score": 0.9472,
+        "support": 300
+      },
+      {
+        "label": "Rhino",
+        "tp": 908,
+        "fp": 8,
+        "fn": 2,
+        "tn": 3934,
+        "precision": 0.9913,
+        "recall": 0.9978,
+        "f1_score": 0.9945,
+        "support": 910
+      },
+      {
+        "label": "Tiger",
+        "tp": 1764,
+        "fp": 3,
+        "fn": 0,
+        "tn": 3085,
+        "precision": 0.9983,
+        "recall": 1.0,
+        "f1_score": 0.9992,
+        "support": 1764
+      },
+      {
+        "label": "black",
+        "tp": 68,
+        "fp": 3,
+        "fn": 0,
+        "tn": 4781,
+        "precision": 0.9577,
+        "recall": 1.0,
+        "f1_score": 0.9784,
+        "support": 68
+      },
+      {
+        "label": "cat",
+        "tp": 299,
+        "fp": 1,
+        "fn": 1,
+        "tn": 4551,
+        "precision": 0.9967,
+        "recall": 0.9967,
+        "f1_score": 0.9967,
+        "support": 300
+      },
+      {
+        "label": "dog",
+        "tp": 299,
+        "fp": 2,
+        "fn": 1,
+        "tn": 4550,
+        "precision": 0.9934,
+        "recall": 0.9967,
+        "f1_score": 0.995,
+        "support": 300
+      }
+    ],
+    "confusion_matrix": [
+      [
+        892,
+        1,
+        5,
+        8,
+        0,
+        3,
+        0,
+        1
+      ],
+      [
+        0,
+        277,
+        23,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        296,
+        0,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        908,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        1764,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        68,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        299,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        299
+      ]
+    ]
+  },
+  "final_history": {
+    "accuracy": [
+      0.9593690633773804,
+      0.9829374551773071,
+      0.9877861738204956,
+      0.9900570511817932,
+      0.9906708598136902
+    ],
+    "val_accuracy": [
+      0.9758862257003784,
+      0.9890766739845276,
+      0.9880461692810059,
+      0.9925803542137146,
+      0.989901065826416
+    ],
+    "loss": [
+      0.1301645189523697,
+      0.048708878457546234,
+      0.035066355019807816,
+      0.028506068512797356,
+      0.0275792945176363
+    ],
+    "val_loss": [
+      0.06651288270950317,
+      0.034333184361457825,
+      0.03527100384235382,
+      0.024634510278701782,
+      0.030640607699751854
+    ]
+  },
+  "charts": {
+    "confusion_matrix": "backend/ml/confusion_matrix_latest.png",
+    "training_curves": "backend/ml/training_curves_latest.png"
+  }
+}
