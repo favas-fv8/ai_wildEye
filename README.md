@@ -51,6 +51,66 @@ The repository excludes large ML training data, archives, generated Django runti
 
 This repository is organized as an application/ML project rather than a minimal library package. The exact model workflow and supported wildlife classes should be reviewed in `ml_code/` before deployment or reuse.
 
+## Screenshots
+
+### Authentication
+
+![Admin Login](captures/images/admin_login.png)
+*Admin login page.*
+
+![Staff Login](captures/images/staff_login.png)
+*Staff login page.*
+
+![Change Password](captures/images/changepassword.png)
+*Change password page.*
+
+### Staff
+
+![Staff Dashboard](captures/images/staff_dashboard.png)
+*Staff dashboard workspace.*
+
+### Admin
+
+![Admin Dashboard](captures/images/admin_dashboard.png)
+*Admin dashboard overview.*
+
+![Staff User Management](captures/images/admin_staff_user_view.png)
+*Admin staff user management view.*
+
+![Email Settings](captures/images/admin_email_settings_view.png)
+*Admin email alert settings view.*
+
+![Model Performance](captures/images/admin_model_performance.jpeg)
+*AI model performance metrics and confusion matrix.*
+
+### Image Analysis
+
+![Image Analysis](captures/images/image_analysis.jpeg)
+*Wildlife image analysis result.*
+
+### Video / Live Camera Analysis
+
+![Video Analysis](captures/images/video_analysis.jpeg)
+*Video analysis result.*
+
+![Live Video Analysis](captures/images/live_video_analysis.png)
+*Live video analysis monitoring.*
+
+![Live Camera Capture Analysis](captures/images/live_cameracapture_analysis.png)
+*Live IP camera capture and analysis.*
+
+### History / Notifications
+
+![Test History](captures/images/history.jpeg)
+*Previous analysis test history.*
+
+![Email Alert](captures/images/email_alert.jpg)
+*Wildlife detection email alert notification.*
+
+## Demo / Video
+
+[Watch the Ai-WildEye demo video](captures/videos/ai_wildEye.mp4)
+
 ## Disclaimer
 
 This project is intended for educational and research purposes. Model predictions should not be treated as definitive identification without appropriate human review.
