@@ -61,7 +61,7 @@
       </div>
     </header>
 
-    <main id="main-content" class="main-content" {% block background %}{% endblock %}>
+    <main id="main-content" class="main-content" {% block background %}style="background-image:url('{% static 'myapp/images/about.jpg' %}'); background-repeat:no-repeat; background-position:center; background-size:cover; background-attachment:fixed;"{% endblock %}>
       {% block body %}{% endblock %}
     </main>
 
